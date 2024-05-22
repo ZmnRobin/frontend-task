@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursive Partitioning Layout Builder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="container" class="partition">
+    <div class="controls">
+      <button class="split-btn" data-direction="V">V</button>
+      <button class="split-btn" data-direction="H">H</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+<style>
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#container {
+  width: 90%;
+  height: 90%;
+  display: flex;
+  position: relative;
+  border: 2px solid black;
+}
+
+.partition {
+  position: relative;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid black;
+  min-width: 50px;
+  min-height: 50px;
+  resize: both;
+}
+
+.controls {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+}
+
+.split-btn, .remove-btn {
+  margin: 2px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('container');
+
+  function randomColor() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  }
+
+  function createPartition(parent) {
+    const partition = document.createElement('div');
+    partition.className = 'partition';
+    partition.style.backgroundColor = randomColor();
+
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+    controls.innerHTML = `
+      <button class="split-btn" data-direction="V">V</button>
+      <button class="split-btn" data-direction="H">H</button>
+      <button class="remove-btn">-</button>
+    `;
+    partition.appendChild(controls);
+
+    partition.addEventListener('click', (e) => {
+      if (e.target.classList.contains('split-btn')) {
+        const direction = e.target.getAttribute('data-direction');
+        splitPartition(partition, direction);
+      }
+      if (e.target.classList.contains('remove-btn')) {
+        removePartition(partition);
+      }
+    });
+
+    parent.appendChild(partition);
+  }
+
+  function splitPartition(partition, direction) {
+    const newPartition = document.createElement('div');
+    newPartition.className = 'partition';
+    newPartition.style.backgroundColor = randomColor();
+
+    partition.style.flexDirection = direction === 'V' ? 'row' : 'column';
+    partition.innerHTML = '';
+    partition.appendChild(newPartition);
+
+    createPartition(partition);
+  }
+
+  function removePartition(partition) {
+    const parent = partition.parentNode;
+    parent.removeChild(partition);
+  }
+
+  createPartition(container);
+});
+</script>
